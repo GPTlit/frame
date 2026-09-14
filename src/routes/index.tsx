@@ -313,7 +313,7 @@ function Hero() {
         </div>
       </div>
 
-      <WaveDivider className="-mb-1" />
+      <WaveDivider className="absolute inset-x-0 bottom-0 z-1" />
     </section>
   );
 }
