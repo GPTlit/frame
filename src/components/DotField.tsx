@@ -1,4 +1,4 @@
-import { useEffect, useRef, memo, type HTMLAttributes } from "react";
+import { useEffect, useId, useRef, memo, type HTMLAttributes } from "react";
 import "./DotField.css";
 
 const TWO_PI = Math.PI * 2;
@@ -79,7 +79,7 @@ const DotField = memo(function DotField({
   };
 
   const rebuildRef = useRef<(() => void) | null>(null);
-  const glowIdRef = useRef(`dot-field-glow-${Math.random().toString(36).slice(2, 9)}`);
+  const glowIdRef = useRef(`dot-field-glow-${useId().replace(/[^a-zA-Z0-9]/g, "")}`);
 
   useEffect(() => {
     const canvas = canvasRef.current;
