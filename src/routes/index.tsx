@@ -4,6 +4,7 @@ import { Reveal, useInView } from "@/components/frame/Reveal";
 import { FrameMark, SiteChrome } from "@/components/frame/SiteChrome";
 import { WaterScene, WaveDivider, Bubbles } from "@/components/frame/WaterScene";
 import { DuneScene, SandParticles, Palm } from "@/components/frame/NatureScene";
+import DotField from "@/components/DotField";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -241,6 +242,23 @@ function Hero() {
         style={{ animation: "drift-b 20s ease-in-out infinite" }}
         aria-hidden
       />
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-90" aria-hidden>
+        <DotField
+          dotRadius={1.5}
+          dotSpacing={14}
+          bulgeStrength={67}
+          glowRadius={160}
+          sparkle={false}
+          waveAmplitude={0}
+          cursorRadius={500}
+          cursorForce={0.1}
+          bulgeOnly
+          gradientFrom="#A855F7"
+          gradientTo="#B497CF"
+          glowColor="#120F17"
+        />
+      </div>
+
       <SandParticles count={18} />
       <Palm className="pointer-events-none absolute -bottom-6 right-[4%] hidden h-56 opacity-30 md:block" delay={1} />
 

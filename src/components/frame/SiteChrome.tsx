@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/hooks/use-theme";
 
 const LINKS = [
   { href: "#identity", label: "Identity" },
@@ -26,6 +28,7 @@ export function SiteChrome() {
   const [progress, setProgress] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { theme, toggle } = useTheme();
 
   useEffect(() => {
     const onScroll = () => {
@@ -54,8 +57,8 @@ export function SiteChrome() {
       <header
         className={`fixed top-0 right-0 left-[var(--rail-w)] z-70 border-b border-border backdrop-blur-md transition-all duration-300 ${
           scrolled
-            ? "bg-[oklch(0.964_0.014_89.5/0.96)] shadow-[var(--shadow-nav)]"
-            : "bg-[oklch(0.964_0.014_89.5/0.86)]"
+            ? "bg-background/95 shadow-[var(--shadow-nav)]"
+            : "bg-background/80"
         }`}
       >
         <div
@@ -80,12 +83,24 @@ export function SiteChrome() {
             ))}
           </nav>
 
-          <a
-            href="#involved"
-            className="hidden rounded-sm border border-foreground px-[18px] py-2 text-[13.5px] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-foreground hover:text-paper lg:inline-block"
-          >
-            Partner with us
-          </a>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggle}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="rounded-full border border-border p-2 text-maroon-accent transition-colors duration-300 hover:border-maroon-accent hover:bg-maroon-accent/10"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+
+            <a
+              href="#involved"
+              className="hidden rounded-sm border border-foreground px-[18px] py-2 text-[13.5px] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-foreground hover:text-paper lg:inline-block"
+            >
+              Partner with us
+            </a>
+          </div>
+
 
           <button
             aria-label="Menu"
