@@ -1,14 +1,18 @@
-# Welcome to your Lovable project
+# Enchanted Garden Display
+
+Is to have so much animation, so much sections, be creative, add water animations, add nature, add stuff like that. I will upload the others. I will upload you some components later
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://whimsical-flow-studio.lovable.app
+
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/7ad0105f-6669-4938-be38-c15c5f274fa4).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +24,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
