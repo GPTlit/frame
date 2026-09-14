@@ -188,7 +188,7 @@ const DotField = memo(function DotField({
 
       ctx!.beginPath();
       for (let i = 0; i < len; i++) {
-        const d = dots[i];
+        const d = dots[i]!;
         const dx = m.x - d.ax;
         const dy = m.y - d.ay;
         const distSq = dx * dx + dy * dy;
