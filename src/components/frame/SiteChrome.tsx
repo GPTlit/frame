@@ -31,6 +31,8 @@ export function SiteChrome() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { theme, toggle } = useTheme();
+  const { lang, setLang } = useLang();
+
 
   useEffect(() => {
     const onScroll = () => {
@@ -86,7 +88,30 @@ export function SiteChrome() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <div
+              className="flex overflow-hidden rounded-full border border-border"
+              role="group"
+              aria-label="Language"
+            >
+              {LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setLang(l.code)}
+                  aria-pressed={lang === l.code}
+                  className={`px-2.5 py-1 text-[11.5px] font-semibold tracking-[0.1em] transition-colors duration-300 ${
+                    lang === l.code
+                      ? "bg-[image:var(--gradient-ember)] text-paper"
+                      : "text-muted-foreground hover:text-maroon-accent"
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+
             <button
+
               type="button"
               onClick={toggle}
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
