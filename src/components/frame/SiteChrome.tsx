@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import { LANGS, useLang } from "@/hooks/use-lang";
 
 const LINKS = [
-  { href: "#identity", label: "Identity" },
-  { href: "#direction", label: "Vision" },
-  { href: "#water", label: "Coast" },
-  { href: "#arenas", label: "Arenas" },
-  { href: "#nature", label: "Land" },
-  { href: "#values", label: "Values" },
-  { href: "#involved", label: "Get involved" },
+  { href: "/#identity", label: "Identity" },
+  { href: "/#direction", label: "Vision" },
+  { href: "/#water", label: "Coast" },
+  { href: "/#arenas", label: "Arenas" },
+  { href: "/#nature", label: "Land" },
+  { href: "/#values", label: "Values" },
+  { href: "/#involved", label: "Get involved" },
 ];
+
 
 export function FrameMark({ className = "" }: { className?: string }) {
   return (
