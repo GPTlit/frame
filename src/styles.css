@@ -560,3 +560,111 @@
   height: 100%;
   flex: none;
 }
+
+/* ---------------- animated list ---------------- */
+.animated-row {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.3s ease,
+    background 0.3s ease;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--paper);
+  padding: 14px 18px;
+  cursor: pointer;
+}
+.animated-row.is-in {
+  opacity: 1;
+  transform: none;
+}
+.animated-row.is-active {
+  border-color: color-mix(in oklab, var(--maroon-accent) 55%, transparent);
+  background: color-mix(in oklab, var(--violet-accent) 8%, var(--paper));
+}
+
+/* ---------------- profile card ---------------- */
+.pc-wrap {
+  --card-opacity: 0;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  position: relative;
+  perspective: 1000px;
+  width: 100%;
+  max-width: 380px;
+}
+.pc-glow {
+  position: absolute;
+  inset: -14%;
+  border-radius: 28px;
+  background: radial-gradient(
+    circle at var(--pointer-x) var(--pointer-y),
+    color-mix(in oklab, var(--maroon-accent) 40%, transparent),
+    color-mix(in oklab, var(--violet-accent) 22%, transparent) 45%,
+    transparent 70%
+  );
+  filter: blur(30px);
+  opacity: var(--card-opacity);
+  transition: opacity 0.5s ease;
+}
+.pc-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--maroon-700) 10%, var(--paper)),
+    color-mix(in oklab, var(--violet-700) 12%, var(--paper))
+  );
+  box-shadow: var(--shadow-lift);
+  padding: 26px 24px;
+  transform: rotateY(var(--rotate-x)) rotateX(var(--rotate-y));
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.pc-shine {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--pointer-x) var(--pointer-y),
+    color-mix(in oklab, var(--maroon-soft) 55%, transparent),
+    transparent 55%
+  );
+  opacity: var(--card-opacity);
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.pc-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--violet-accent) 12%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--maroon-accent) 12%, transparent) 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: 0.35;
+  mask-image: radial-gradient(circle at 30% 0%, black, transparent 75%);
+  pointer-events: none;
+}
+.pc-tag {
+  border: 1px solid color-mix(in oklab, var(--violet-accent) 45%, transparent);
+  border-radius: 100px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--violet-accent);
+}
+
+/* ---------------- language visibility ---------------- */
+[data-lang="en"] [data-l]:not([data-l="en"]),
+[data-lang="fr"] [data-l]:not([data-l="fr"]),
+[data-lang="ar"] [data-l]:not([data-l="ar"]) {
+  display: none;
+}
+
+/* room for the bottom dock */
+main {
+  padding-bottom: 96px;
+}
