@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Reveal, useInView } from "@/components/frame/Reveal";
-import { FrameMark, SiteChrome } from "@/components/frame/SiteChrome";
+import { FrameMark } from "@/components/frame/SiteChrome";
 import { WaterScene, WaveDivider, Bubbles } from "@/components/frame/WaterScene";
 import { DuneScene, SandParticles, Palm } from "@/components/frame/NatureScene";
 import DotField from "@/components/DotField";
+import WarpText from "@/components/WarpText";
+import GradientWaves from "@/components/fx/GradientWaves";
+import { useTheme } from "@/hooks/use-theme";
+import { useLang } from "@/hooks/use-lang";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -210,6 +215,9 @@ const MARQUEE = [
 function Hero() {
   const heroRef = useRef<HTMLElement | null>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const { theme } = useTheme();
+  const { lang } = useLang();
+
 
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
