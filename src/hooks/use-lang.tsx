@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type Lang = "en" | "fr" | "ar";
 
@@ -10,7 +17,11 @@ export const LANGS: { code: Lang; label: string }[] = [
   { code: "ar", label: "AR" },
 ];
 
-export function useLang() {
+type LangCtx = { lang: Lang; setLang: (l: Lang) => void };
+
+const Ctx = createContext<LangCtx>({ lang: "en", setLang: () => {} });
+
+export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("en");
 
   useEffect(() => {
@@ -27,7 +38,11 @@ export function useLang() {
     setLangState(next);
   }, []);
 
-  return { lang, setLang };
+  return <Ctx.Provider value={{ lang, setLang }}>{children}</Ctx.Provider>;
+}
+
+export function useLang() {
+  return useContext(Ctx);
 }
 
 /** Pick the copy for the active language, falling back to English. */
