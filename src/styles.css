@@ -44,6 +44,10 @@
   --color-maroon-600: var(--maroon-600);
   --color-maroon-accent: var(--maroon-accent);
   --color-maroon-soft: var(--maroon-soft);
+  --color-violet-900: var(--violet-900);
+  --color-violet-700: var(--violet-700);
+  --color-violet-accent: var(--violet-accent);
+  --color-violet-soft: var(--violet-soft);
   --color-water-deep: var(--water-deep);
   --color-water: var(--water);
   --color-water-light: var(--water-light);
@@ -51,6 +55,7 @@
   --color-sand-deep: var(--sand-deep);
   --color-palm: var(--palm);
   --color-palm-light: var(--palm-light);
+
 }
 
 :root {
