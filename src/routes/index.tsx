@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Reveal, useInView } from "@/components/frame/Reveal";
-import { FrameMark, SiteChrome } from "@/components/frame/SiteChrome";
+import { FrameMark } from "@/components/frame/SiteChrome";
 import { WaterScene, WaveDivider, Bubbles } from "@/components/frame/WaterScene";
 import { DuneScene, SandParticles, Palm } from "@/components/frame/NatureScene";
 import DotField from "@/components/DotField";
+import WarpText from "@/components/WarpText";
+import GradientWaves from "@/components/fx/GradientWaves";
+import { useTheme } from "@/hooks/use-theme";
+import { useLang } from "@/hooks/use-lang";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -210,6 +215,9 @@ const MARQUEE = [
 function Hero() {
   const heroRef = useRef<HTMLElement | null>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const { theme } = useTheme();
+  const { lang } = useLang();
+
 
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
@@ -253,9 +261,9 @@ function Hero() {
           cursorRadius={500}
           cursorForce={0.1}
           bulgeOnly
-          gradientFrom="#A855F7"
-          gradientTo="#B497CF"
-          glowColor="#120F17"
+          gradientFrom={theme === "dark" ? "#FF5A5F" : "#C1121F"}
+          gradientTo={theme === "dark" ? "#B06CF5" : "#8B5CF6"}
+          glowColor={theme === "dark" ? "#150F1A" : "#FFF7F7"}
         />
       </div>
 
@@ -272,24 +280,43 @@ function Hero() {
           <FrameMark className="mark-draw h-[76px] w-16 text-maroon-700" />
         </div>
 
-        <h1
-          className="max-w-[15em] text-[clamp(38px,6.2vw,76px)] leading-[1.05] font-normal"
-          style={{ transform: `translate(${tilt.x * -6}px, ${tilt.y * -4}px)` }}
-        >
-          <span className="line-mask">
-            <span style={{ animationDelay: "0.25s" }}>
-              A frame for <em className="not-italic text-maroon-accent">talent</em>,
-            </span>
+        <h1 className="max-w-[16em] font-display text-[clamp(38px,6.2vw,76px)] leading-[1.05] font-normal">
+          <span className="sr-only">
+            A frame for talent, challenge and meaningful experiences.
           </span>
-          <span className="line-mask">
+          <WarpText
+            text={
+              lang === "fr"
+                ? "Un cadre pour le talent"
+                : lang === "ar"
+                  ? "إطار للموهبة"
+                  : "A frame for talent"
+            }
+            color={theme === "dark" ? "#FFE9EC" : "#7A0B18"}
+            warpStrength={0.08}
+            warpScale={1.7}
+            speed={0.55}
+            pointerInfluence={0.42}
+            pointerStrength={0.38}
+            refraction={0.018}
+            ripple
+            fontSize="clamp(38px, 6.2vw, 76px)"
+            fontWeight={600}
+            fontFamily="inherit"
+            letterSpacing="-0.02em"
+            lineHeight={1.05}
+            style={{ height: "150px" }}
+          />
+          <span className="line-mask block">
             <span style={{ animationDelay: "0.4s" }}>
               <em className="not-italic text-maroon-accent">challenge</em> and meaningful
             </span>
           </span>
-          <span className="line-mask">
+          <span className="line-mask block">
             <span style={{ animationDelay: "0.55s" }}>experiences.</span>
           </span>
         </h1>
+
 
         <div
           className="mt-14 grid max-w-[920px] gap-[34px] border-t border-border pt-[30px] opacity-0 md:grid-cols-3"

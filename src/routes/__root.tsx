@@ -11,6 +11,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { ThemeProvider } from "../hooks/use-theme";
+import { LangProvider } from "../hooks/use-lang";
+import { AppShell } from "../components/frame/AppShell";
+
 
 function NotFoundComponent() {
   return (
@@ -126,8 +130,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <ThemeProvider>
+        <LangProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <AppShell>
+            <Outlet />
+          </AppShell>
+        </LangProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
+
