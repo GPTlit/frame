@@ -134,11 +134,21 @@ const DotField = memo(function DotField({
       dotsRef.current = dots;
     }
 
-    function onMouseMove(e: MouseEvent) {
+    function setMouse(pageX: number, pageY: number) {
       const s = sizeRef.current;
-      mouseRef.current.x = e.pageX - s.offsetX;
-      mouseRef.current.y = e.pageY - s.offsetY;
+      mouseRef.current.x = pageX - s.offsetX;
+      mouseRef.current.y = pageY - s.offsetY;
     }
+
+    function onMouseMove(e: MouseEvent) {
+      setMouse(e.pageX, e.pageY);
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      const t = e.touches[0];
+      if (t) setMouse(t.pageX, t.pageY);
+    }
+
 
     function updateMouseSpeed() {
       const m = mouseRef.current;
