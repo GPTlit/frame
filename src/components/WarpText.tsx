@@ -445,7 +445,6 @@ export default function WarpText({
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      if (event.pointerType === "touch") return;
       const rect = canvas.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
       pointer.tx = (event.clientX - rect.left) / rect.width;
