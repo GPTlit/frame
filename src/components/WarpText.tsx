@@ -230,13 +230,13 @@ type AnyProgram = {
 
 const syncUniforms = (program: AnyProgram, props: TextProps) => {
   const u = program.uniforms;
-  u.uWarpStrength!.value = props.warpStrength;
-  u.uWarpScale!.value = props.warpScale;
-  u.uSpeed!.value = props.speed;
-  u.uPointerInfluence!.value = props.pointerInfluence;
-  u.uPointerStrength!.value = props.pointerStrength;
-  u.uRefraction!.value = props.refraction;
-  u.uRipple!.value = props.ripple ? 1 : 0;
+  u['uWarpStrength']!.value = props.warpStrength;
+  u['uWarpScale']!.value = props.warpScale;
+  u['uSpeed']!.value = props.speed;
+  u['uPointerInfluence']!.value = props.pointerInfluence;
+  u['uPointerStrength']!.value = props.pointerStrength;
+  u['uRefraction']!.value = props.refraction;
+  u['uRipple']!.value = props.ripple ? 1 : 0;
 };
 
 export default function WarpText({
@@ -423,7 +423,7 @@ export default function WarpText({
       if (rect.width <= 0 || rect.height <= 0) return;
       renderer.dpr = Math.min(window.devicePixelRatio || 1, 2);
       renderer.setSize(rect.width, rect.height);
-      const res = uniforms.uResolution!.value as unknown as Float32Array;
+      const res = uniforms['uResolution']!.value as unknown as Float32Array;
       res[0] = gl.drawingBufferWidth;
       res[1] = gl.drawingBufferHeight;
       void rasterize();
@@ -458,13 +458,13 @@ export default function WarpText({
       pointer.x += (targetX - pointer.x) * damping;
       pointer.y += (targetY - pointer.y) * damping;
       pointer.active += ((pointer.activeTarget > 0 ? 1 : 0.18) - pointer.active) * 0.06;
-      const p = uniforms.uPointer!.value as unknown as Float32Array;
+      const p = uniforms['uPointer']!.value as unknown as Float32Array;
       p[0] = pointer.x;
       p[1] = pointer.y;
-      uniforms.uPointerActive!.value = (
+      uniforms['uPointerActive']!.value = (
         reduceMotion ? pointer.active * 0.35 : pointer.active
       ) as never;
-      uniforms.uTime!.value = (reduceMotion ? 0 : elapsed) as never;
+      uniforms['uTime']!.value = (reduceMotion ? 0 : elapsed) as never;
       renderOnce();
       raf = requestAnimationFrame(loop);
     };
@@ -481,7 +481,7 @@ export default function WarpText({
     const mediaQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)");
     const onReducedMotion = (event: MediaQueryListEvent) => {
       reduceMotion = event.matches;
-      uniforms.uMotion!.value = (reduceMotion ? 0 : 1) as never;
+      uniforms['uMotion']!.value = (reduceMotion ? 0 : 1) as never;
       renderOnce();
     };
 

@@ -926,7 +926,7 @@ function Footer() {
 function Index() {
   return (
     <div className="min-h-screen bg-background">
-      <SiteChrome />
+      
       <main>
         <Hero />
         <Marquee />
