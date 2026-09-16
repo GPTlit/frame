@@ -30,8 +30,12 @@ export function LangProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-lang", lang);
+    const root = document.documentElement;
+    root.setAttribute("data-lang", lang);
+    root.setAttribute("lang", lang);
+    root.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
   }, [lang]);
+
 
   const setLang = useCallback((next: Lang) => {
     localStorage.setItem(KEY, next);
