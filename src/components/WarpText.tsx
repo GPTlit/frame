@@ -122,7 +122,12 @@ export type WarpTextProps = Partial<TextProps> & {
 const getFontValue = (value: number | string) =>
   typeof value === "number" ? `${value}px` : value;
 
+const RTL_RE = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+
 const measureLine = (ctx: CanvasRenderingContext2D, line: string, letterSpacing: number) => {
+  // Arabic/Hebrew must be measured and drawn as a whole run so the shaping
+  // and right-to-left ordering the browser applies stays intact.
+  if (RTL_RE.test(line)) return ctx.measureText(line).width;
   const chars = Array.from(line);
   const textWidth = chars.reduce((width, char) => width + ctx.measureText(char).width, 0);
   return textWidth + Math.max(0, chars.length - 1) * letterSpacing;
@@ -135,6 +140,15 @@ const drawLine = (
   y: number,
   letterSpacing: number,
 ) => {
+  if (RTL_RE.test(line)) {
+    const prevAlign = ctx.textAlign;
+    ctx.direction = "rtl";
+    ctx.textAlign = "center";
+    ctx.fillText(line, x, y);
+    ctx.direction = "ltr";
+    ctx.textAlign = prevAlign;
+    return;
+  }
   const chars = Array.from(line);
   let cursor = x - measureLine(ctx, line, letterSpacing) / 2;
   chars.forEach((char, index) => {
@@ -142,6 +156,7 @@ const drawLine = (
     cursor += ctx.measureText(char).width + (index === chars.length - 1 ? 0 : letterSpacing);
   });
 };
+
 
 function buildTextCanvas({
   container,
@@ -430,7 +445,6 @@ export default function WarpText({
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      if (event.pointerType === "touch") return;
       const rect = canvas.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
       pointer.tx = (event.clientX - rect.left) / rect.width;

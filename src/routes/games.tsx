@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import AnimatedList from "@/components/fx/AnimatedList";
 import GradientWaves from "@/components/fx/GradientWaves";
+import ParticleText from "@/components/ParticleText";
 import { t, useLang } from "@/hooks/use-lang";
+
 
 export const Route = createFileRoute("/games")({
   head: () => ({
