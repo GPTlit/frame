@@ -1,7 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import ProfileCard from "@/components/ProfileCard";
 import { t, useLang } from "@/hooks/use-lang";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  getMyProfile,
+  resolveAvatarUrl,
+  saveMyProfile,
+  uploadAvatar,
+  type Profile,
+} from "@/lib/profiles";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -22,41 +31,94 @@ export const Route = createFileRoute("/profile")({
   component: ProfilePage,
 });
 
-const KEY = "frame-profile";
-
-type Profile = {
-  name: string;
-  handle: string;
-  avatarUrl: string;
-  tags: string[];
-};
-
-const EMPTY: Profile = { name: "", handle: "", avatarUrl: "", tags: [] };
-
 function ProfilePage() {
   const { lang } = useLang();
-  const [p, setP] = useState<Profile>(EMPTY);
+  const { user } = useAuth();
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [tag, setTag] = useState("");
+  const [status, setStatus] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem(KEY);
-    if (raw) {
-      try {
-        setP({ ...EMPTY, ...(JSON.parse(raw) as Partial<Profile>) });
-      } catch {
-        /* ignore malformed storage */
-      }
-    }
-  }, []);
+    if (!user) return;
+    let alive = true;
+    getMyProfile(user.id)
+      .then(async (p) => {
+        if (!alive) return;
+        const next =
+          p ??
+          ({
+            id: user.id,
+            username: null,
+            full_name: null,
+            avatar_url: null,
+            talents: [],
+            points: 0,
+            contributions: 0,
+          } satisfies Profile);
+        setProfile(next);
+        setAvatarPreview(await resolveAvatarUrl(next.avatar_url));
+      })
+      .catch((e: unknown) => setStatus(e instanceof Error ? e.message : String(e)));
+    return () => {
+      alive = false;
+    };
+  }, [user]);
 
-  const save = (next: Profile) => {
-    setP(next);
-    localStorage.setItem(KEY, JSON.stringify(next));
+  const patch = (next: Partial<Profile>) =>
+    setProfile((prev) => (prev ? { ...prev, ...next } : prev));
+
+  const save = async (override?: Partial<Profile>) => {
+    if (!user || !profile) return;
+    setBusy(true);
+    setStatus(null);
+    try {
+      const body = { ...profile, ...override };
+      await saveMyProfile(user.id, {
+        username: body.username?.trim().toLowerCase() || null,
+        full_name: body.full_name?.trim() || null,
+        avatar_url: body.avatar_url,
+        talents: body.talents,
+      });
+      setStatus(t(lang, { en: "Saved", fr: "Enregistré", ar: "تم الحفظ" }));
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const label = "mb-1.5 block text-[12px] font-semibold tracking-[0.14em] uppercase text-muted-foreground";
+  const onPick = async (file: File) => {
+    if (!user) return;
+    setBusy(true);
+    setStatus(null);
+    try {
+      const path = await uploadAvatar(user.id, file);
+      patch({ avatar_url: path });
+      setAvatarPreview(await resolveAvatarUrl(path));
+      await save({ avatar_url: path });
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const label =
+    "mb-1.5 block text-[12px] font-semibold tracking-[0.14em] uppercase text-muted-foreground";
   const field =
     "w-full rounded-md border border-input bg-transparent px-3.5 py-2.5 text-[15px] outline-none focus:border-maroon-accent";
+
+  if (!profile) {
+    return (
+      <main className="grid min-h-[60vh] place-items-center pt-[92px]">
+        <span className="h-7 w-7 animate-spin rounded-full border-2 border-maroon-accent border-t-transparent" />
+      </main>
+    );
+  }
 
   return (
     <main className="pt-[92px]">
@@ -84,8 +146,9 @@ function ProfilePage() {
               <input
                 id="pf-name"
                 className={field}
-                value={p.name}
-                onChange={(e) => save({ ...p, name: e.target.value })}
+                value={profile.full_name ?? ""}
+                onChange={(e) => patch({ full_name: e.target.value })}
+                onBlur={() => void save()}
                 placeholder="Aminetou Salem"
               />
             </div>
@@ -97,23 +160,48 @@ function ProfilePage() {
               <input
                 id="pf-handle"
                 className={field}
-                value={p.handle}
-                onChange={(e) => save({ ...p, handle: e.target.value })}
+                value={profile.username ?? ""}
+                onChange={(e) => patch({ username: e.target.value })}
+                onBlur={() => void save()}
                 placeholder="aminetou"
               />
             </div>
 
             <div>
-              <label className={label} htmlFor="pf-avatar">
-                {t(lang, { en: "Picture link", fr: "Lien de la photo", ar: "رابط الصورة" })}
-              </label>
-              <input
-                id="pf-avatar"
-                className={field}
-                value={p.avatarUrl}
-                onChange={(e) => save({ ...p, avatarUrl: e.target.value })}
-                placeholder="https://…"
-              />
+              <span className={label}>
+                {t(lang, { en: "Profile picture", fr: "Photo de profil", ar: "صورة الملف" })}
+              </span>
+              <div className="flex items-center gap-3">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) void onPick(f);
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => fileRef.current?.click()}
+                  className="rounded-md border border-maroon-accent px-4 py-2 text-[14px] font-semibold text-maroon-accent transition-colors hover:bg-maroon-accent/10 disabled:opacity-60"
+                >
+                  {t(lang, {
+                    en: "Upload a picture",
+                    fr: "Téléverser une photo",
+                    ar: "ارفع صورة",
+                  })}
+                </button>
+                {avatarPreview && (
+                  <img
+                    src={avatarPreview}
+                    alt=""
+                    className="h-11 w-11 rounded-full object-cover ring-2 ring-maroon-accent/60"
+                  />
+                )}
+              </div>
             </div>
 
             <div>
@@ -125,9 +213,11 @@ function ProfilePage() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   const v = tag.trim();
-                  if (!v || p.tags.includes(v)) return;
-                  save({ ...p, tags: [...p.tags, v] });
+                  if (!v || profile.talents.includes(v)) return;
+                  const talents = [...profile.talents, v];
+                  patch({ talents });
                   setTag("");
+                  void save({ talents });
                 }}
               >
                 <input
@@ -135,7 +225,11 @@ function ProfilePage() {
                   className={field}
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
-                  placeholder={t(lang, { en: "e.g. Photography", fr: "ex. Photographie", ar: "مثال: التصوير" })}
+                  placeholder={t(lang, {
+                    en: "e.g. Photography",
+                    fr: "ex. Photographie",
+                    ar: "مثال: التصوير",
+                  })}
                 />
                 <button
                   type="submit"
@@ -144,14 +238,18 @@ function ProfilePage() {
                   {t(lang, { en: "Add", fr: "Ajouter", ar: "أضف" })}
                 </button>
               </form>
-              {p.tags.length > 0 && (
+              {profile.talents.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {p.tags.map((tg) => (
+                  {profile.talents.map((tg) => (
                     <button
                       key={tg}
                       type="button"
                       className="pc-tag"
-                      onClick={() => save({ ...p, tags: p.tags.filter((x) => x !== tg) })}
+                      onClick={() => {
+                        const talents = profile.talents.filter((x) => x !== tg);
+                        patch({ talents });
+                        void save({ talents });
+                      }}
                       aria-label={`Remove ${tg}`}
                     >
                       {tg} ×
@@ -161,23 +259,37 @@ function ProfilePage() {
               )}
             </div>
 
-            <p className="text-[13px] text-muted-foreground">
-              {t(lang, {
-                en: "Signing in with Google and saving profiles for everyone needs the built-in backend switched on.",
-                fr: "La connexion Google et l'enregistrement des profils nécessitent l'activation du backend intégré.",
-                ar: "تسجيل الدخول عبر جوجل وحفظ الملفات يحتاج تشغيل الخدمة الخلفية.",
-              })}
-            </p>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void save()}
+                className="rounded-md bg-[image:var(--gradient-ember)] px-6 py-2.5 text-[15px] font-semibold text-paper disabled:opacity-60"
+              >
+                {t(lang, { en: "Save profile", fr: "Enregistrer", ar: "احفظ الملف" })}
+              </button>
+              <button
+                type="button"
+                onClick={() => void supabase.auth.signOut()}
+                className="text-[13.5px] font-semibold text-muted-foreground underline-offset-4 hover:text-maroon-accent hover:underline"
+              >
+                {t(lang, { en: "Sign out", fr: "Se déconnecter", ar: "تسجيل الخروج" })}
+              </button>
+              {status && <span className="text-[13px] text-muted-foreground">{status}</span>}
+            </div>
           </div>
 
           <ProfileCard
-            name={p.name || t(lang, { en: "Your name", fr: "Votre nom", ar: "اسمك" })}
-            handle={p.handle || "frame"}
-            title={p.tags[0] ?? t(lang, { en: "Talent", fr: "Talent", ar: "موهبة" })}
-            tags={p.tags}
-            {...(p.avatarUrl ? { avatarUrl: p.avatarUrl } : {})}
-            rank="Rising #128"
-            contributions={12}
+            name={
+              profile.full_name?.trim() ||
+              t(lang, { en: "Your name", fr: "Votre nom", ar: "اسمك" })
+            }
+            handle={profile.username?.trim() || "frame"}
+            title={profile.talents[0] ?? t(lang, { en: "Talent", fr: "Talent", ar: "موهبة" })}
+            tags={profile.talents}
+            {...(avatarPreview ? { avatarUrl: avatarPreview } : {})}
+            rank={`${profile.points} ${t(lang, { en: "points", fr: "points", ar: "نقطة" })}`}
+            contributions={profile.contributions}
           />
         </div>
       </section>
