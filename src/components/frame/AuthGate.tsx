@@ -36,9 +36,38 @@ function SignInScreen() {
   const google = async () => {
     setError(null);
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
+
+    // The Lovable broker only works on Lovable-hosted origins. Anywhere else
+    // (self-hosting, another host, a custom deployment) we go straight to the
+    // standard Google redirect flow.
+    const host = window.location.hostname;
+    const onLovableHost =
+      host.endsWith(".lovable.app") || host.endsWith(".lovable.dev") || host === "localhost";
+
+    if (!onLovableHost) {
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin },
+      });
+      if (err) {
+        setError(err.message);
+        setBusy(false);
+      }
+      return;
+    }
+
+    let result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
+    if (result.error) {
+      // Broker failed even on a Lovable origin — fall back to the direct flow.
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin },
+      });
+      if (!err) return;
+      result = { error: err } as typeof result;
+    }
     if (result.error) {
       setError(
         t(lang, {
