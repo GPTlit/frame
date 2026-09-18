@@ -5,6 +5,7 @@ import GradientWaves from "@/components/fx/GradientWaves";
 import ParticleText from "@/components/ParticleText";
 import { listProfiles, displayName, type Profile } from "@/lib/profiles";
 import { t, useLang } from "@/hooks/use-lang";
+import { useTheme } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/games")({
   head: () => ({
@@ -69,7 +70,7 @@ function GamesPage() {
           text={t(lang, { en: "GAMES", fr: "JEUX", ar: "الألعاب" })}
           particleSize={2.2}
           density={4}
-          color="#f8fafc"
+          color={theme === "dark" ? "#f8fafc" : "#7A0B18"}
           highlightColor="#8b5cf6"
           scatter={280}
           gatherDuration={1600}
