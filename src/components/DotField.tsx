@@ -261,6 +261,10 @@ const DotField = memo(function DotField({
     doResize();
     window.addEventListener("resize", resize);
     window.addEventListener("mousemove", onMouseMove, { passive: true });
+    // Passive touch listeners: the dots react to a finger while the page
+    // keeps scrolling normally.
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchstart", onTouchMove, { passive: true });
     rafRef.current = requestAnimationFrame(tick);
 
     rebuildRef.current = () => {
@@ -274,6 +278,8 @@ const DotField = memo(function DotField({
       clearTimeout(resizeTimer);
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchstart", onTouchMove);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
