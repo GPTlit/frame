@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { LANGS, useLang } from "@/hooks/use-lang";
+import frameLogo from "@/assets/frame-logo.png.asset.json";
 
 const LINKS = [
   { href: "/#identity", label: "Identity" },
@@ -16,13 +17,12 @@ const LINKS = [
 
 export function FrameMark({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 40 46" fill="none" className={className}>
-      <path
-        d="M4 2H36C37.5 2 38 3 38 4V14C38 15.5 37 16 36 16H16V44H4V2Z"
-        stroke="currentColor"
-        strokeWidth="2.2"
-      />
-    </svg>
+    <img
+      src={frameLogo.url}
+      alt="FRAME"
+      className={`object-contain ${className}`}
+      draggable={false}
+    />
   );
 }
 
