@@ -36,6 +36,7 @@ function rankTitle(points: number) {
 
 function GamesPage() {
   const { lang } = useLang();
+  const { theme } = useTheme();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
