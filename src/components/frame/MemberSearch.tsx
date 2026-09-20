@@ -41,7 +41,7 @@ export function MemberSearch() {
   }, [profiles, query]);
 
   return (
-    <div ref={rootRef} className="relative hidden md:block">
+    <div ref={rootRef} className="relative">
       <div
         className={`flex h-9 items-center overflow-hidden rounded-full border bg-card/75 shadow-[var(--shadow-search)] backdrop-blur-xl transition-[width,border-color,box-shadow] duration-300 ${
           open ? "w-[260px] border-maroon-accent" : "w-9 border-border"

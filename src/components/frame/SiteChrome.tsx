@@ -89,7 +89,9 @@ export function SiteChrome() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <MemberSearch />
+            <div className="hidden md:block">
+              <MemberSearch />
+            </div>
             <div
               className="flex overflow-hidden rounded-full border border-border"
               role="group"
@@ -151,6 +153,9 @@ export function SiteChrome() {
 
       {open && (
         <div className="fixed inset-y-0 right-0 left-[var(--rail-w)] top-[64px] z-65 overflow-y-auto bg-paper px-6 py-8 lg:hidden">
+          <div className="mb-6 md:hidden">
+            <MemberSearch />
+          </div>
           {LINKS.map((l, i) => (
             <a
               key={l.href}
