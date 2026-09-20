@@ -377,7 +377,6 @@ export default function ParticleText({
 
     const handlePointerEnter = (event: PointerEvent) => {
       handlePointerMove(event);
-      if (trigger === "hover") startGather(true);
     };
 
     const handleClick = () => {
@@ -392,7 +391,6 @@ export default function ParticleText({
 
     reduceMotionQuery?.addEventListener("change", handleReduceMotionChange);
     canvas.addEventListener("pointerenter", handlePointerEnter);
-    canvas.addEventListener("pointerdown", handlePointerEnter);
     canvas.addEventListener("pointermove", handlePointerMove);
     canvas.addEventListener("pointerleave", handlePointerLeave);
     canvas.addEventListener("pointerup", handlePointerLeave);
@@ -407,7 +405,6 @@ export default function ParticleText({
       resizeObserver.disconnect();
       reduceMotionQuery?.removeEventListener("change", handleReduceMotionChange);
       canvas.removeEventListener("pointerenter", handlePointerEnter);
-      canvas.removeEventListener("pointerdown", handlePointerEnter);
       canvas.removeEventListener("pointermove", handlePointerMove);
       canvas.removeEventListener("pointerleave", handlePointerLeave);
       canvas.removeEventListener("pointerup", handlePointerLeave);
