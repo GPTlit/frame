@@ -3,6 +3,7 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { LANGS, useLang } from "@/hooks/use-lang";
 import frameLogo from "@/assets/frame-logo.png.asset.json";
+import { MemberSearch } from "@/components/frame/MemberSearch";
 
 const LINKS = [
   { href: "/#identity", label: "Identity" },
@@ -20,7 +21,7 @@ export function FrameMark({ className = "" }: { className?: string }) {
     <img
       src={frameLogo.url}
       alt="FRAME"
-      className={`object-contain ${className}`}
+      className={`object-contain drop-shadow-[0_3px_5px_var(--logo-highlight)] ${className}`}
       draggable={false}
     />
   );
@@ -71,7 +72,7 @@ export function SiteChrome() {
           }`}
         >
           <a href="#top" className="group flex items-center gap-2.5">
-            <FrameMark className="h-[26px] w-[22px] text-maroon-700 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110" />
+            <FrameMark className="h-9 w-8 text-maroon-700 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110" />
             <span className="font-display text-[19px] font-semibold tracking-[0.12em]">FRAME</span>
           </a>
 
@@ -88,6 +89,7 @@ export function SiteChrome() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <MemberSearch />
             <div
               className="flex overflow-hidden rounded-full border border-border"
               role="group"

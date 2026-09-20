@@ -79,7 +79,7 @@ function GamesPage() {
           pointerRepel={42}
           repelRadius={120}
           idleDrift={0.8}
-          trigger="hover"
+          trigger="mount"
           fontSize="clamp(3.5rem, 13vw, 9rem)"
           fontWeight={500}
           fontFamily="inherit"

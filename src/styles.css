@@ -126,6 +126,8 @@
   --gradient-ember: linear-gradient(135deg, var(--maroon-700), var(--violet-accent));
   --shadow-lift: 0 24px 48px -30px oklch(0.26 0.09 20 / 0.3);
   --shadow-nav: 0 10px 30px -18px oklch(0.26 0.09 20 / 0.28);
+  --shadow-search: 0 16px 38px -18px color-mix(in oklab, var(--violet-accent) 40%, transparent);
+  --logo-highlight: oklch(1 0 0 / 0.9);
 }
 
 .dark {
@@ -177,6 +179,8 @@
   --gradient-ember: linear-gradient(135deg, var(--maroon-600), var(--violet-accent));
   --shadow-lift: 0 24px 48px -30px oklch(0 0 0 / 0.65);
   --shadow-nav: 0 10px 30px -18px oklch(0 0 0 / 0.6);
+  --shadow-search: 0 16px 42px -18px color-mix(in oklab, var(--violet-accent) 55%, transparent);
+  --logo-highlight: oklch(1 0 0 / 0.78);
 }
 
 
