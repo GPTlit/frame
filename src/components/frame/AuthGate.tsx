@@ -90,7 +90,7 @@ function SignInScreen() {
     <main className="grid min-h-screen place-items-center px-5 py-16">
       <div className="w-full max-w-[430px]">
         <div className="flex items-center gap-3">
-          <FrameMark className="h-11 w-10 text-maroon-700" />
+          <FrameMark className="h-[77px] w-[70px] text-maroon-700" />
           <span className="font-display text-[22px] font-semibold tracking-[0.14em]">FRAME</span>
         </div>
 

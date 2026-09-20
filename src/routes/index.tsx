@@ -277,7 +277,7 @@ function Hero() {
             transform: `translate(${tilt.x * 14}px, ${tilt.y * 10}px) rotate(${tilt.x * 4}deg)`,
           }}
         >
-          <FrameMark className="mark-draw h-[76px] w-16 text-maroon-700" />
+          <FrameMark className="mark-draw h-[133px] w-28 text-maroon-700" />
         </div>
 
         <h1 className="max-w-[16em] font-display text-[clamp(38px,6.2vw,76px)] leading-[1.05] font-normal">
