@@ -21,7 +21,7 @@ export function FrameMark({ className = "" }: { className?: string }) {
     <img
       src={frameLogo.url}
       alt="FRAME"
-      className={`object-contain drop-shadow-[0_3px_5px_var(--logo-highlight)] ${className}`}
+      className={`object-contain dark:brightness-0 dark:invert ${className}`}
       draggable={false}
     />
   );
@@ -68,11 +68,11 @@ export function SiteChrome() {
       >
         <div
           className={`wrap flex items-center justify-between transition-all duration-300 ${
-            scrolled ? "h-[60px]" : "h-[72px]"
+            scrolled ? "h-[76px]" : "h-[88px]"
           }`}
         >
           <a href="#top" className="group flex items-center gap-2.5">
-            <FrameMark className="h-9 w-8 text-maroon-700 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110" />
+            <FrameMark className="h-[63px] w-14 text-maroon-700 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110" />
             <span className="font-display text-[19px] font-semibold tracking-[0.12em]">FRAME</span>
           </a>
 
