@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useIsAdmin } from "@/lib/admin";
 import ProfileCard from "@/components/ProfileCard";
 import { t, useLang } from "@/hooks/use-lang";
 import { useAuth } from "@/hooks/use-auth";
@@ -35,6 +36,7 @@ function ProfilePage() {
   const { lang } = useLang();
   const { user } = useAuth();
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const isAdmin = useIsAdmin();
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -275,6 +277,14 @@ function ProfilePage() {
               >
                 {t(lang, { en: "Sign out", fr: "Se déconnecter", ar: "تسجيل الخروج" })}
               </button>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="rounded-md border border-maroon-accent px-4 py-2 text-[14px] font-semibold text-maroon-accent hover:bg-maroon-accent/10"
+                >
+                  Admin
+                </Link>
+              )}
               {status && <span className="text-[13px] text-muted-foreground">{status}</span>}
             </div>
           </div>
