@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { LANGS, useLang } from "@/hooks/use-lang";
-import frameLogo from "@/assets/frame-logo.png.asset.json";
 import { MemberSearch } from "@/components/frame/MemberSearch";
 
 const LINKS = [
@@ -19,7 +18,7 @@ const LINKS = [
 export function FrameMark({ className = "" }: { className?: string }) {
   return (
     <img
-      src={frameLogo.url}
+      src="/frame-logo.png"
       alt="FRAME"
       className={`object-contain dark:brightness-0 dark:invert ${className}`}
       draggable={false}
@@ -72,7 +71,7 @@ export function SiteChrome() {
           }`}
         >
           <a href="#top" className="group flex items-center gap-2.5">
-            <FrameMark className="h-[63px] w-14 text-maroon-700 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110" />
+            <FrameMark className="h-11 w-10 text-maroon-700 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105" />
             <span className="font-display text-[19px] font-semibold tracking-[0.12em]">FRAME</span>
           </a>
 

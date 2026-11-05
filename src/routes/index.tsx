@@ -272,12 +272,12 @@ function Hero() {
 
       <div className="wrap relative z-2">
         <div
-          className="mb-9 w-16 will-change-transform"
+          className="mb-1 w-24 will-change-transform md:w-28"
           style={{
             transform: `translate(${tilt.x * 14}px, ${tilt.y * 10}px) rotate(${tilt.x * 4}deg)`,
           }}
         >
-          <FrameMark className="mark-draw h-[133px] w-28 text-maroon-700" />
+          <FrameMark className="mark-draw h-24 w-24 text-maroon-700 md:h-28 md:w-28" />
         </div>
 
         <h1 className="max-w-[16em] font-display text-[clamp(38px,6.2vw,76px)] leading-[1.05] font-normal">
@@ -305,7 +305,7 @@ function Hero() {
             fontFamily="inherit"
             letterSpacing="-0.02em"
             lineHeight={1.05}
-            style={{ height: "150px" }}
+            style={{ height: "clamp(75px, 9vw, 115px)" }}
           />
           <span className="line-mask block">
             <span style={{ animationDelay: "0.4s" }}>
