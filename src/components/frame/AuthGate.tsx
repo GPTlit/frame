@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
 import { t, useLang } from "@/hooks/use-lang";
 import { FrameMark } from "@/components/frame/SiteChrome";
+import { normalizePhone, phoneLoginEmail } from "@/lib/phone-auth";
 
 /** Everybody signs in before the app opens. */
 export function AuthGate({ children }: { children: ReactNode }) {
@@ -24,60 +24,53 @@ export function AuthGate({ children }: { children: ReactNode }) {
 function SignInScreen() {
   const { lang } = useLang();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const field =
     "w-full rounded-md border border-input bg-transparent px-3.5 py-2.5 text-[15px] outline-none focus:border-maroon-accent";
 
-  const google = async () => {
-    setError(null);
-    setBusy(true);
-
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-      extraParams: { prompt: "select_account" },
-    });
-    if (result.error) {
-      setError(
-        t(lang, {
-          en: "Google sign-in failed. Try again.",
-          fr: "La connexion Google a échoué. Réessayez.",
-          ar: "فشل تسجيل الدخول عبر جوجل. حاول مرة أخرى.",
-        }),
-      );
-      setBusy(false);
-    }
-  };
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setNote(null);
+    const digits = normalizePhone(phone);
+    if (digits.length < 6) {
+      setError(t(lang, { en: "Enter a valid phone number.", fr: "Entrez un numéro valide.", ar: "أدخل رقم هاتف صحيحًا." }));
+      return;
+    }
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { data, error: err } = await supabase.auth.signUp({
-          email,
+        const handle = username.trim().toLowerCase().replace(/[^a-z0-9_.]/g, "");
+        if (handle.length < 3) {
+          throw new Error(t(lang, { en: "Username needs at least 3 letters or numbers.", fr: "Le pseudo doit contenir au moins 3 caractères.", ar: "اسم المستخدم يحتاج 3 أحرف على الأقل." }));
+        }
+        const { error: err } = await supabase.auth.signUp({
+          email: phoneLoginEmail(digits),
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { data: { username: handle, contact_email: email.trim().toLowerCase(), phone: digits } },
         });
-        if (err) throw err;
-        if (!data.session) {
-          setNote(
-            t(lang, {
-              en: "Check your email to confirm your account, then sign in.",
-              fr: "Vérifiez votre e-mail pour confirmer votre compte, puis connectez-vous.",
-              ar: "تحقق من بريدك لتأكيد الحساب ثم سجّل الدخول.",
-            }),
-          );
+        if (err) {
+          if (/registered|exists/i.test(err.message)) {
+            throw new Error(t(lang, { en: "This number is already registered. Sign in instead.", fr: "Ce numéro est déjà inscrit. Connectez-vous.", ar: "هذا الرقم مسجل بالفعل. سجّل الدخول." }));
+          }
+          if (/database error/i.test(err.message)) {
+            throw new Error(t(lang, { en: "That username or email is already taken.", fr: "Ce pseudo ou e-mail est déjà pris.", ar: "اسم المستخدم أو البريد مستخدم بالفعل." }));
+          }
+          throw err;
         }
       } else {
-        const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-        if (err) throw err;
+        const { error: err } = await supabase.auth.signInWithPassword({
+          email: phoneLoginEmail(digits),
+          password,
+        });
+        if (err) {
+          throw new Error(t(lang, { en: "Wrong phone number or password.", fr: "Numéro ou mot de passe incorrect.", ar: "رقم الهاتف أو كلمة السر غير صحيحة." }));
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -100,72 +93,31 @@ function SignInScreen() {
             : t(lang, { en: "Join FRAME", fr: "Rejoindre FRAME", ar: "انضم إلى إطار" })}
         </h1>
         <p className="mt-3 text-[15px] text-muted-foreground">
-          {t(lang, {
-            en: "Sign in to see events, ranks and real member profiles.",
-            fr: "Connectez-vous pour voir les événements, les classements et les profils réels.",
-            ar: "سجّل الدخول لرؤية الأحداث والترتيب وملفات الأعضاء الحقيقية.",
-          })}
+          {mode === "signin"
+            ? t(lang, { en: "Sign in with your phone number and password.", fr: "Connectez-vous avec votre numéro et mot de passe.", ar: "سجّل الدخول برقم هاتفك وكلمة السر." })
+            : t(lang, { en: "Create your account in seconds — no email confirmation needed.", fr: "Créez votre compte en quelques secondes, sans confirmation par e-mail.", ar: "أنشئ حسابك في ثوانٍ بدون تأكيد البريد." })}
         </p>
 
-        <button
-          type="button"
-          onClick={google}
-          disabled={busy}
-          className="mt-8 flex w-full items-center justify-center gap-3 rounded-md border border-border bg-card px-4 py-3 text-[15px] font-semibold transition-colors hover:border-maroon-accent disabled:opacity-60"
-        >
-          <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
-            <path
-              fill="#4285F4"
-              d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.4a5.5 5.5 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.6-5.2 3.6-8.8Z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1 .7-2.4 1.2-4 1.2a7 7 0 0 1-6.6-4.8H1.4v3.1A12 12 0 0 0 12 24Z"
-            />
-            <path fill="#FBBC05" d="M5.4 14.5a7.2 7.2 0 0 1 0-4.6V6.8H1.4a12 12 0 0 0 0 10.4l4-2.7Z" />
-            <path
-              fill="#EA4335"
-              d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.8l4 3.1A7 7 0 0 1 12 4.8Z"
-            />
-          </svg>
-          {t(lang, {
-            en: "Continue with Google",
-            fr: "Continuer avec Google",
-            ar: "المتابعة عبر جوجل",
-          })}
-        </button>
-
-        <div className="my-6 flex items-center gap-3 text-[12px] tracking-[0.2em] text-muted-foreground uppercase">
-          <span className="h-px flex-1 bg-border" />
-          {t(lang, { en: "or", fr: "ou", ar: "أو" })}
-          <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <form onSubmit={submit} className="grid gap-4">
-          <input
-            className={field}
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={t(lang, { en: "Email", fr: "E-mail", ar: "البريد الإلكتروني" })}
-          />
-          <input
-            className={field}
-            type="password"
-            required
-            minLength={6}
+        <form onSubmit={submit} className="mt-8 grid gap-4">
+          {mode === "signup" && (
+            <>
+              <input className={field} required value={username} onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                placeholder={t(lang, { en: "Username", fr: "Pseudo", ar: "اسم المستخدم" })} />
+              <input className={field} type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                placeholder={t(lang, { en: "Email", fr: "E-mail", ar: "البريد الإلكتروني" })} />
+            </>
+          )}
+          <input className={field} type="tel" required inputMode="tel" autoComplete="tel" value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder={t(lang, { en: "Phone number (e.g. +222 …)", fr: "Numéro de téléphone (ex. +222 …)", ar: "رقم الهاتف (مثال +222 …)" })} />
+          <input className={field} type="password" required minLength={6}
             autoComplete={mode === "signup" ? "new-password" : "current-password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={t(lang, { en: "Password", fr: "Mot de passe", ar: "كلمة السر" })}
-          />
-          <button
-            type="submit"
-            disabled={busy}
-            className="rounded-md bg-[image:var(--gradient-ember)] px-5 py-3 text-[15px] font-semibold text-paper disabled:opacity-60"
-          >
+            value={password} onChange={(e) => setPassword(e.target.value)}
+            placeholder={t(lang, { en: "Password", fr: "Mot de passe", ar: "كلمة السر" })} />
+          <button type="submit" disabled={busy}
+            className="rounded-md bg-[image:var(--gradient-ember)] px-5 py-3 text-[15px] font-semibold text-paper disabled:opacity-60">
             {mode === "signin"
               ? t(lang, { en: "Sign in", fr: "Se connecter", ar: "تسجيل الدخول" })
               : t(lang, { en: "Create account", fr: "Créer un compte", ar: "إنشاء حساب" })}
@@ -173,28 +125,13 @@ function SignInScreen() {
         </form>
 
         {error && <p className="mt-4 text-[13.5px] text-maroon-accent">{error}</p>}
-        {note && <p className="mt-4 text-[13.5px] text-muted-foreground">{note}</p>}
 
-        <button
-          type="button"
-          onClick={() => {
-            setMode(mode === "signin" ? "signup" : "signin");
-            setError(null);
-            setNote(null);
-          }}
-          className="mt-6 text-[13.5px] font-semibold text-maroon-accent underline-offset-4 hover:underline"
-        >
+        <button type="button"
+          onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); }}
+          className="mt-6 text-[13.5px] font-semibold text-maroon-accent underline-offset-4 hover:underline">
           {mode === "signin"
-            ? t(lang, {
-                en: "New here? Create an account",
-                fr: "Nouveau ? Créez un compte",
-                ar: "جديد؟ أنشئ حسابًا",
-              })
-            : t(lang, {
-                en: "Already a member? Sign in",
-                fr: "Déjà membre ? Connectez-vous",
-                ar: "عضو بالفعل؟ سجّل الدخول",
-              })}
+            ? t(lang, { en: "New here? Create an account", fr: "Nouveau ? Créez un compte", ar: "جديد؟ أنشئ حسابًا" })
+            : t(lang, { en: "Already a member? Sign in", fr: "Déjà membre ? Connectez-vous", ar: "عضو بالفعل؟ سجّل الدخول" })}
         </button>
       </div>
     </main>
