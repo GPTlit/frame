@@ -15,6 +15,13 @@
       "when": 1793957093848,
       "tag": "0001_social_messaging_media_games",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793957118791,
+      "tag": "0002_storage_chat_media_policies",
+      "breakpoints": true
     }
   ]
 }
