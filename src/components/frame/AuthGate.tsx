@@ -116,18 +116,7 @@ export function SignInScreen({
         }
         setWhatsAppSuccessUrl(waUrl);
 
-        if (newUserId) {
-          try {
-            await supabase.from("notifications").insert({
-              user_id: newUserId,
-              title: `New Member Request: @${handle}`,
-              body: `Phone: ${digits} | Email: ${email.trim()}`,
-              kind: "notification",
-            });
-          } catch {
-            // ignore
-          }
-        }
+        return;
       } else {
         const { data: signInData, error: err } = await supabase.auth.signInWithPassword({
           email: phoneLoginEmail(digits),
@@ -149,30 +138,21 @@ export function SignInScreen({
         const currentEmail =
           typeof userMeta["contact_email"] === "string" ? userMeta["contact_email"] : "";
 
-        const waUrl = createApprovalWhatsAppUrl({
-          username: currentHandle,
-          phone: digits,
-          email: currentEmail,
-          userId: signedInUser?.id,
-        });
-
-        // Direct WhatsApp dispatch to admin
-        if (typeof window !== "undefined") {
-          window.open(waUrl, "_blank");
-        }
-        setWhatsAppSuccessUrl(waUrl);
-
-        if (signedInUser?.id) {
-          try {
-            await supabase.from("notifications").insert({
-              user_id: signedInUser.id,
-              title: `Sign-in Notification: @${currentHandle || "member"}`,
-              body: `Phone: ${digits} | Email: ${currentEmail}`,
-              kind: "notification",
-            });
-          } catch {
-            // ignore
-          }
+        const { data: statusRow } = await supabase
+          .from("profiles")
+          .select("member_status")
+          .eq("id", signedInUser?.id ?? "")
+          .maybeSingle();
+        if (statusRow?.member_status !== "approved") {
+          const waUrl = createApprovalWhatsAppUrl({
+            username: currentHandle,
+            phone: digits,
+            email: currentEmail,
+            userId: signedInUser?.id,
+          });
+          if (typeof window !== "undefined") window.open(waUrl, "_blank");
+          setWhatsAppSuccessUrl(waUrl);
+          return;
         }
       }
 
@@ -220,9 +200,9 @@ export function SignInScreen({
           <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold text-sm">
             <ShieldCheck className="h-5 w-5" />
             {t(lang, {
-              en: "Sign-in Notification Sent to Admin",
-              fr: "Notification envoyée à l'administrateur",
-              ar: "تم إرسال إشعار الدخول إلى المشرف",
+              en: "Waiting for admin approval",
+              fr: "En attente de l'approbation de l'admin",
+              ar: "في انتظار موافقة المشرف",
             })}
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
