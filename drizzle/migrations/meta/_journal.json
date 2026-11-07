@@ -29,6 +29,13 @@
       "when": 1794011308753,
       "tag": "0003_member_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794011428555,
+      "tag": "0004_public_read_avatars_media",
+      "breakpoints": true
     }
   ]
 }

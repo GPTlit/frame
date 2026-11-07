@@ -1,0 +1,2 @@
+CREATE POLICY "Anyone can view avatars" ON storage.objects FOR SELECT TO anon USING (bucket_id = 'avatars');
+CREATE POLICY "Anyone can view media" ON storage.objects FOR SELECT TO anon USING (bucket_id = 'media');
