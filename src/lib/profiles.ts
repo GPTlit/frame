@@ -1,3 +1,4 @@
+import { signedUrl } from "@/lib/social";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Profile = {
@@ -76,18 +77,13 @@ export async function uploadCover(userId: string, file: File): Promise<string> {
   return path;
 }
 
-/** Resolves a stored avatar value: full URL passes through, storage paths get public URL. */
+/** Resolves a stored avatar value into a viewable URL that works on any host. */
 export async function resolveAvatarUrl(value: string | null): Promise<string | null> {
   if (!value) return null;
+  const m = value.match(/\/storage\/v1\/object\/(?:public|sign)\/avatars\/([^?]+)/);
+  if (m?.[1]) return signedUrl("avatars", decodeURIComponent(m[1]));
   if (/^(https?:|data:|blob:)/.test(value)) return value;
-  const cleanPath = value.replace(/^avatars\//, "").replace(/^\/+/, "");
-  try {
-    const { data } = supabase.storage.from("avatars").getPublicUrl(cleanPath);
-    if (data?.publicUrl) return data.publicUrl;
-  } catch {
-    // fallback
-  }
-  return `https://c--7ad0105f-6669-4938-be38-c15c5f274fa4-prod.lovable.cloud/storage/v1/object/public/avatars/${cleanPath}`;
+  return signedUrl("avatars", value.replace(/^avatars\//, "").replace(/^\/+/, ""));
 }
 
 export function displayName(p: Pick<Profile, "full_name" | "username">) {

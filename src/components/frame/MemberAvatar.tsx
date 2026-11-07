@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useMemo, useEffect } from "react";
+import { signedUrl } from "@/lib/social";
 
 interface MemberAvatarProps {
   avatarUrl?: string | null | undefined;
@@ -38,24 +38,38 @@ const GRADIENTS = [
   "from-cyan-700 to-blue-600",
 ];
 
-export function resolveAvatarUrl(url?: string | null): string | null {
+/** Cleans a stored avatar value into a storage path (or returns an absolute URL). */
+function avatarPath(url?: string | null): string | null {
   if (!url || typeof url !== "string" || !url.trim()) return null;
   const trimmed = url.trim();
+  const m = trimmed.match(/\/storage\/v1\/object\/(?:public|sign)\/avatars\/([^?]+)/);
+  if (m?.[1]) return decodeURIComponent(m[1]);
+  if (/^(https?:|data:|blob:)/.test(trimmed)) return trimmed;
+  return trimmed.replace(/^avatars\//, "").replace(/^\/+/, "");
+}
 
-  // If already absolute or data URL
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")) {
-    return trimmed;
-  }
-
-  // If relative path within storage bucket "avatars"
-  const cleanPath = trimmed.replace(/^avatars\//, "").replace(/^\/+/, "");
-  try {
-    const { data } = supabase.storage.from("avatars").getPublicUrl(cleanPath);
-    if (data?.publicUrl) return data.publicUrl;
-  } catch {
-    // fallback to static domain construction
-  }
-  return `https://c--7ad0105f-6669-4938-be38-c15c5f274fa4-prod.lovable.cloud/storage/v1/object/public/avatars/${cleanPath}`;
+/** Returns a viewable URL for a stored avatar/cover; works on any host. */
+export function useAvatarUrl(url?: string | null): string | null {
+  const path = avatarPath(url);
+  const [resolved, setResolved] = useState<string | null>(
+    path && /^(https?:|data:|blob:)/.test(path) ? path : null,
+  );
+  useEffect(() => {
+    let alive = true;
+    if (!path) {
+      setResolved(null);
+      return;
+    }
+    if (/^(https?:|data:|blob:)/.test(path)) {
+      setResolved(path);
+      return;
+    }
+    void signedUrl("avatars", path).then((u) => alive && setResolved(u));
+    return () => {
+      alive = false;
+    };
+  }, [path]);
+  return resolved;
 }
 
 export function MemberAvatar({
@@ -69,7 +83,7 @@ export function MemberAvatar({
 }: MemberAvatarProps) {
   const [hasError, setHasError] = useState(false);
 
-  const resolvedUrl = useMemo(() => resolveAvatarUrl(avatarUrl), [avatarUrl]);
+  const resolvedUrl = useAvatarUrl(avatarUrl);
 
   const initials = useMemo(() => {
     const displayName = (name || username || "Member").trim();

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MemberAvatar, resolveAvatarUrl } from "@/components/frame/MemberAvatar";
+import { MemberAvatar, useAvatarUrl } from "@/components/frame/MemberAvatar";
 import type { FullProfile } from "@/lib/social";
 import {
   MessageSquare,
@@ -54,7 +54,7 @@ export function MemberProfileModal({
 
   if (!member) return null;
 
-  const resolvedCover = resolveAvatarUrl(member.cover_url);
+  const resolvedCover = useAvatarUrl(member.cover_url);
   const socials = Object.entries(member.social_links || {}).filter(([_, url]) => Boolean(url));
 
   const handleMessage = () => {
