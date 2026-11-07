@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Lang = "en" | "fr" | "ar";
 
@@ -35,7 +28,6 @@ export function LangProvider({ children }: { children: ReactNode }) {
     root.setAttribute("lang", lang);
     root.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
   }, [lang]);
-
 
   const setLang = useCallback((next: Lang) => {
     localStorage.setItem(KEY, next);

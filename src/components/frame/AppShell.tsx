@@ -11,13 +11,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="relative min-h-screen bg-background">
       <ScrollLight />
       <GlowCursor />
-      <AuthGate>
-        <div className="relative z-10">
-          <SiteChrome />
-          {children}
-          <BottomNav />
-        </div>
-      </AuthGate>
+      <div className="relative z-10">
+        <SiteChrome />
+        {children}
+        <BottomNav />
+      </div>
     </div>
   );
 }

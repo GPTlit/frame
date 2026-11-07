@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Moon, Sun, Globe, ChevronDown, Check } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
-import { LANGS, useLang } from "@/hooks/use-lang";
+import { LANGS, useLang, t } from "@/hooks/use-lang";
+import { useAuth } from "@/hooks/use-auth";
 import { MemberSearch } from "@/components/frame/MemberSearch";
 
 const LINKS = [
@@ -13,7 +15,6 @@ const LINKS = [
   { href: "/#values", label: "Values" },
   { href: "/#involved", label: "Get involved" },
 ];
-
 
 export function FrameMark({ className = "" }: { className?: string }) {
   return (
@@ -30,9 +31,21 @@ export function SiteChrome() {
   const [progress, setProgress] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
   const { theme, toggle } = useTheme();
   const { lang, setLang } = useLang();
+  const { user } = useAuth();
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -60,9 +73,7 @@ export function SiteChrome() {
 
       <header
         className={`fixed top-0 right-0 left-[var(--rail-w)] z-70 border-b border-border backdrop-blur-md transition-all duration-300 ${
-          scrolled
-            ? "bg-background/95 shadow-[var(--shadow-nav)]"
-            : "bg-background/80"
+          scrolled ? "bg-background/95 shadow-[var(--shadow-nav)]" : "bg-background/80"
         }`}
       >
         <div
@@ -91,30 +102,57 @@ export function SiteChrome() {
             <div className="hidden md:block">
               <MemberSearch />
             </div>
-            <div
-              className="flex overflow-hidden rounded-full border border-border"
-              role="group"
-              aria-label="Language"
-            >
-              {LANGS.map((l) => (
-                <button
-                  key={l.code}
-                  type="button"
-                  onClick={() => setLang(l.code)}
-                  aria-pressed={lang === l.code}
-                  className={`px-2.5 py-1 text-[11.5px] font-semibold tracking-[0.1em] transition-colors duration-300 ${
-                    lang === l.code
-                      ? "bg-[image:var(--gradient-ember)] text-paper"
-                      : "text-muted-foreground hover:text-maroon-accent"
-                  }`}
-                >
-                  {l.label}
-                </button>
-              ))}
+            {/* Compact Language Selector Dropdown */}
+            <div className="relative" ref={langMenuRef}>
+              <button
+                type="button"
+                onClick={() => setLangOpen((v) => !v)}
+                className="flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[12px] font-semibold text-foreground hover:border-maroon-accent hover:bg-maroon-accent/5 transition-colors"
+                aria-haspopup="listbox"
+                aria-expanded={langOpen}
+                aria-label="Change language"
+              >
+                <Globe className="h-3.5 w-3.5 text-maroon-accent" />
+                <span className="uppercase tracking-wider text-[11px] font-bold">{lang}</span>
+                <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${langOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {langOpen && (
+                <div className="absolute right-0 top-full mt-2 w-36 rounded-xl border border-border bg-background/95 p-1 shadow-xl backdrop-blur-md z-80 animate-in fade-in zoom-in-95 duration-150">
+                  {LANGS.map((l) => {
+                    const fullNames: Record<string, string> = {
+                      en: "English",
+                      fr: "Français",
+                      ar: "العربية",
+                    };
+                    const isSelected = lang === l.code;
+                    return (
+                      <button
+                        key={l.code}
+                        type="button"
+                        onClick={() => {
+                          setLang(l.code);
+                          setLangOpen(false);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                          isSelected
+                            ? "bg-maroon-700/10 text-maroon-700 font-semibold dark:text-maroon-300"
+                            : "text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="font-bold text-[11px] text-muted-foreground uppercase">{l.code}</span>
+                          <span>{fullNames[l.code] || l.label}</span>
+                        </span>
+                        {isSelected && <Check className="h-3.5 w-3.5 text-maroon-700 dark:text-maroon-400" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <button
-
               type="button"
               onClick={toggle}
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
@@ -122,6 +160,22 @@ export function SiteChrome() {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
+
+            {user ? (
+              <Link
+                to="/profile"
+                className="inline-flex items-center rounded-md border border-maroon-accent/50 bg-maroon-700/10 px-3.5 py-1.5 text-[13px] font-semibold text-maroon-accent hover:bg-maroon-accent/20 transition-colors"
+              >
+                {t(lang, { en: "Profile", fr: "Profil", ar: "الملف" })}
+              </Link>
+            ) : (
+              <Link
+                to="/profile"
+                className="inline-flex items-center rounded-md bg-[image:var(--gradient-ember)] px-3.5 py-1.5 text-[13px] font-semibold text-paper shadow transition-opacity hover:opacity-95"
+              >
+                {t(lang, { en: "Sign In", fr: "Connexion", ar: "دخول" })}
+              </Link>
+            )}
 
             <a
               href="#involved"
@@ -131,12 +185,7 @@ export function SiteChrome() {
             </a>
           </div>
 
-
-          <button
-            aria-label="Menu"
-            onClick={() => setOpen((v) => !v)}
-            className="p-1.5 lg:hidden"
-          >
+          <button aria-label="Menu" onClick={() => setOpen((v) => !v)} className="p-1.5 lg:hidden">
             <span
               className={`block h-0.5 w-[22px] bg-foreground transition-transform duration-300 ${open ? "translate-y-[7px] rotate-45" : ""}`}
             />

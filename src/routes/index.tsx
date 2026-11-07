@@ -7,9 +7,9 @@ import { DuneScene, SandParticles, Palm } from "@/components/frame/NatureScene";
 import DotField from "@/components/DotField";
 import WarpText from "@/components/WarpText";
 import GradientWaves from "@/components/fx/GradientWaves";
+import { FeaturedMediaSpotlight } from "@/components/frame/FeaturedMediaSpotlight";
 import { useTheme } from "@/hooks/use-theme";
 import { useLang } from "@/hooks/use-lang";
-
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -56,14 +56,18 @@ function Eyebrow({
       <span>{en}</span>
       <span className={tone === "dark" ? "text-[oklch(1_0_0/0.25)]" : "text-border"}>/</span>
       <span
-        className={tone === "dark" ? "font-medium text-maroon-soft" : "font-medium text-muted-foreground"}
+        className={
+          tone === "dark" ? "font-medium text-maroon-soft" : "font-medium text-muted-foreground"
+        }
       >
         {fr}
       </span>
       <span className={tone === "dark" ? "text-[oklch(1_0_0/0.25)]" : "text-border"}>/</span>
       <span
         dir="rtl"
-        className={tone === "dark" ? "font-medium text-maroon-soft" : "font-medium text-muted-foreground"}
+        className={
+          tone === "dark" ? "font-medium text-maroon-soft" : "font-medium text-muted-foreground"
+        }
       >
         {ar}
       </span>
@@ -181,8 +185,14 @@ const VMPA = [
 ];
 
 const ABCD = [
-  { letter: "A — Attraction", text: "A clear concept, strong event name and identity that attracts." },
-  { letter: "B — Competition", text: "Published rules, clear stages, disciplined judging and fairness." },
+  {
+    letter: "A — Attraction",
+    text: "A clear concept, strong event name and identity that attracts.",
+  },
+  {
+    letter: "B — Competition",
+    text: "Published rules, clear stages, disciplined judging and fairness.",
+  },
   {
     letter: "C — Experience",
     text: "Qualifiers, pacing, surprise moments, strong finals and engaging coverage.",
@@ -197,8 +207,16 @@ const VALUES = [
   ["01", "Excellence", "Execution quality is part of the organization's reputation."],
   ["02", "Fairness", "Clear rules, impartial judging and transparent results."],
   ["03", "Intelligence", "Design formats that genuinely reward thinking and skill."],
-  ["04", "Inclusion", "Create space for different talents while respecting each activity's nature."],
-  ["05", "Impact", "Each activity should add value to participants, community or Mauritania's image."],
+  [
+    "04",
+    "Inclusion",
+    "Create space for different talents while respecting each activity's nature.",
+  ],
+  [
+    "05",
+    "Impact",
+    "Each activity should add value to participants, community or Mauritania's image.",
+  ],
   ["06", "Identity", "Every event should feel unmistakably FRAME even before the name is seen."],
 ];
 
@@ -217,7 +235,6 @@ function Hero() {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const { theme } = useTheme();
   const { lang } = useLang();
-
 
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
@@ -268,7 +285,10 @@ function Hero() {
       </div>
 
       <SandParticles count={18} />
-      <Palm className="pointer-events-none absolute -bottom-6 right-[4%] hidden h-56 opacity-30 md:block" delay={1} />
+      <Palm
+        className="pointer-events-none absolute -bottom-6 right-[4%] hidden h-56 opacity-30 md:block"
+        delay={1}
+      />
 
       <div className="wrap relative z-2">
         <div
@@ -281,9 +301,7 @@ function Hero() {
         </div>
 
         <h1 className="max-w-[16em] font-display text-[clamp(38px,6.2vw,76px)] leading-[1.05] font-normal">
-          <span className="sr-only">
-            A frame for talent, challenge and meaningful experiences.
-          </span>
+          <span className="sr-only">A frame for talent, challenge and meaningful experiences.</span>
           <WarpText
             text={
               lang === "fr"
@@ -316,7 +334,6 @@ function Hero() {
             <span style={{ animationDelay: "0.55s" }}>experiences.</span>
           </span>
         </h1>
-
 
         <div
           className="mt-14 grid max-w-[920px] gap-[34px] border-t border-border pt-[30px] opacity-0 md:grid-cols-3"
@@ -394,7 +411,7 @@ function Identity() {
         />
 
         <div className="grid gap-6 md:grid-cols-3">
-          <Reveal delay={0} className="frame-card" >
+          <Reveal delay={0} className="frame-card">
             <span className="mb-3.5 block text-[11px] font-semibold tracking-[0.12em] uppercase text-maroon-accent">
               العربية
             </span>
@@ -541,9 +558,24 @@ function WaterSection() {
 
           <div className="mt-14 grid gap-6 md:grid-cols-3">
             {[
-              { n: 754, s: " km", l: "Atlantic shoreline", d: "From Cap Blanc down to the Senegal river mouth." },
-              { n: 5, s: "", l: "Coastal arenas", d: "Swim, row, beach sport, clean-up, marine knowledge." },
-              { n: 12, s: " mo", l: "Season", d: "Trade winds make the coast competitive all year." },
+              {
+                n: 754,
+                s: " km",
+                l: "Atlantic shoreline",
+                d: "From Cap Blanc down to the Senegal river mouth.",
+              },
+              {
+                n: 5,
+                s: "",
+                l: "Coastal arenas",
+                d: "Swim, row, beach sport, clean-up, marine knowledge.",
+              },
+              {
+                n: 12,
+                s: " mo",
+                l: "Season",
+                d: "Trade winds make the coast competitive all year.",
+              },
             ].map((c, i) => (
               <Reveal
                 key={c.l}
@@ -566,9 +598,21 @@ function WaterSection() {
 function Journey() {
   const { ref, inView } = useInView<HTMLDivElement>(0.3);
   const steps = [
-    ["01", "Competitor", "Young people take part in a FRAME event across academics, games, sport, culture or community action."],
-    ["02", "Supported talent", "Standout participants are identified and accompanied as their ability develops."],
-    ["03", "National representation", "The strongest talents form teams capable of carrying Mauritania's name into regional and international competition."],
+    [
+      "01",
+      "Competitor",
+      "Young people take part in a FRAME event across academics, games, sport, culture or community action.",
+    ],
+    [
+      "02",
+      "Supported talent",
+      "Standout participants are identified and accompanied as their ability develops.",
+    ],
+    [
+      "03",
+      "National representation",
+      "The strongest talents form teams capable of carrying Mauritania's name into regional and international competition.",
+    ],
   ];
   return (
     <section id="journey" className="border-t border-border py-26">
@@ -666,8 +710,14 @@ function NatureSection() {
         />
         <div className="grid gap-6 md:grid-cols-3">
           {[
-            ["Oasis", "Date palms, shade and water — the original meeting place for knowledge and trade."],
-            ["Dune", "Shifting sand teaches adaptation: our formats evolve with the people in them."],
+            [
+              "Oasis",
+              "Date palms, shade and water — the original meeting place for knowledge and trade.",
+            ],
+            [
+              "Dune",
+              "Shifting sand teaches adaptation: our formats evolve with the people in them.",
+            ],
             ["Horizon", "Ambition beyond borders — regional and international collaboration."],
           ].map(([t, d], i) => (
             <Reveal key={t} delay={i * 120} className="frame-card">
@@ -751,8 +801,8 @@ function Audience() {
           <Eyebrow en="Audience" fr="Public" ar="الجمهور" />
           <h2 className="text-[clamp(28px,4vw,42px)] font-normal">Who FRAME is built for</h2>
           <p className="mt-3.5 text-[17px] text-muted-foreground">
-            A youthful, premium and competitive identity — built for young Mauritanians who want more
-            than one lane to prove themselves in.
+            A youthful, premium and competitive identity — built for young Mauritanians who want
+            more than one lane to prove themselves in.
           </p>
           <ul className="mt-6 grid gap-4">
             {[
@@ -773,10 +823,10 @@ function Audience() {
         <Reveal delay={150} className="frame-card">
           <h3 className="mb-3.5 text-[20px]">Not a single-lane club</h3>
           <p className="text-[14.5px] text-muted-foreground">
-            FRAME is not a traditional academic club, and not an entertainment platform only. It is a
-            multidisciplinary frame — built around experience and challenge — where the same standard
-            of fairness and design quality applies whether the arena is a chessboard, a football
-            pitch, a shoreline clean-up or a charity drive.
+            FRAME is not a traditional academic club, and not an entertainment platform only. It is
+            a multidisciplinary frame — built around experience and challenge — where the same
+            standard of fairness and design quality applies whether the arena is a chessboard, a
+            football pitch, a shoreline clean-up or a charity drive.
           </p>
         </Reveal>
       </div>
@@ -786,9 +836,27 @@ function Audience() {
 
 function Involved() {
   const items = [
-    ["Compete", "Join an arena — academic, strategy, sport, culture, coast or community — and start on the pathway from competitor to supported talent.", "See the arenas", "#arenas", "↓"],
-    ["Volunteer", "Support FRAME's community and charity initiatives, and help turn each event into concrete, positive impact.", "Learn what FRAME stands for", "#identity", "↓"],
-    ["Partner", "FRAME is built with an ambition for regional and international cooperation — for organizations who want to help build that bridge.", "Get in touch", "#top", "↑"],
+    [
+      "Compete",
+      "Join an arena — academic, strategy, sport, culture, coast or community — and start on the pathway from competitor to supported talent.",
+      "See the arenas",
+      "#arenas",
+      "↓",
+    ],
+    [
+      "Volunteer",
+      "Support FRAME's community and charity initiatives, and help turn each event into concrete, positive impact.",
+      "Learn what FRAME stands for",
+      "#identity",
+      "↓",
+    ],
+    [
+      "Partner",
+      "FRAME is built with an ambition for regional and international cooperation — for organizations who want to help build that bridge.",
+      "Get in touch",
+      "#top",
+      "↑",
+    ],
   ];
   return (
     <section id="involved" className="border-t border-border py-26">
@@ -873,7 +941,9 @@ function Footer() {
           <div>
             <a href="#top" className="group flex items-center gap-2.5">
               <FrameMark className="h-[26px] w-[22px] text-maroon-700 transition-transform duration-500 group-hover:-rotate-6" />
-              <span className="font-display text-[22px] font-semibold tracking-[0.12em]">FRAME</span>
+              <span className="font-display text-[22px] font-semibold tracking-[0.12em]">
+                FRAME
+              </span>
             </a>
             <p className="mt-3.5 max-w-[32ch] text-[14px] text-muted-foreground">
               A Mauritanian platform bringing together entertainment, competition, knowledge, sport
@@ -923,10 +993,19 @@ function Footer() {
   );
 }
 
+function MediaSection() {
+  return (
+    <section className="border-t border-border py-20">
+      <div className="wrap">
+        <FeaturedMediaSpotlight placement="home" />
+      </div>
+    </section>
+  );
+}
+
 function Index() {
   return (
     <div className="min-h-screen bg-background">
-      
       <main>
         <Hero />
         <Marquee />
@@ -937,6 +1016,7 @@ function Index() {
         <Arenas />
         <NatureSection />
         <EventDna />
+        <MediaSection />
         <Values />
         <Audience />
         <Involved />

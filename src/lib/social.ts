@@ -21,12 +21,23 @@ export type FullProfile = {
 export const FULL_COLUMNS =
   "id, username, full_name, avatar_url, cover_url, bio, location, talents, interests, social_links, show_online, last_seen, points, contributions, created_at";
 
-export const SOCIAL_KEYS = ["instagram", "x", "tiktok", "youtube", "linkedin", "github", "website"] as const;
+export const SOCIAL_KEYS = [
+  "instagram",
+  "x",
+  "tiktok",
+  "youtube",
+  "linkedin",
+  "github",
+  "website",
+] as const;
 
 /* ---------- signed URL cache (keeps media fast and avoids re-signing) ---------- */
 const urlCache = new Map<string, { url: string; exp: number }>();
 
-export async function signedUrl(bucket: string, path: string | null | undefined): Promise<string | null> {
+export async function signedUrl(
+  bucket: string,
+  path: string | null | undefined,
+): Promise<string | null> {
   if (!path) return null;
   if (/^(https?:|blob:|data:)/.test(path)) return path;
   const key = `${bucket}/${path}`;
@@ -50,7 +61,11 @@ export async function getProfileByUsername(username: string): Promise<FullProfil
 }
 
 export async function getProfileById(id: string): Promise<FullProfile | null> {
-  const { data, error } = await supabase.from("profiles").select(FULL_COLUMNS).eq("id", id).maybeSingle();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select(FULL_COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
   if (error) throw error;
   return data as FullProfile | null;
 }
@@ -129,13 +144,24 @@ export async function removeConnection(a: string, b: string) {
 
 export async function getFollowCounts(userId: string) {
   const [a, b] = await Promise.all([
-    supabase.from("follows").select("follower", { count: "exact", head: true }).eq("following", userId),
-    supabase.from("follows").select("following", { count: "exact", head: true }).eq("follower", userId),
+    supabase
+      .from("follows")
+      .select("follower", { count: "exact", head: true })
+      .eq("following", userId),
+    supabase
+      .from("follows")
+      .select("following", { count: "exact", head: true })
+      .eq("follower", userId),
   ]);
   return { followers: a.count ?? 0, following: b.count ?? 0 };
 }
 export async function isFollowing(me: string, other: string) {
-  const { data } = await supabase.from("follows").select("follower").eq("follower", me).eq("following", other).maybeSingle();
+  const { data } = await supabase
+    .from("follows")
+    .select("follower")
+    .eq("follower", me)
+    .eq("following", other)
+    .maybeSingle();
   return !!data;
 }
 export async function setFollow(me: string, other: string, on: boolean) {
@@ -144,7 +170,12 @@ export async function setFollow(me: string, other: string, on: boolean) {
 }
 
 export async function isBlocked(me: string, other: string) {
-  const { data } = await supabase.from("blocks").select("blocker").eq("blocker", me).eq("blocked", other).maybeSingle();
+  const { data } = await supabase
+    .from("blocks")
+    .select("blocker")
+    .eq("blocker", me)
+    .eq("blocked", other)
+    .maybeSingle();
   return !!data;
 }
 export async function setBlock(me: string, other: string, on: boolean) {
@@ -226,7 +257,8 @@ export async function createGroup(input: {
 }
 
 export const MAX_UPLOAD = 50 * 1024 * 1024;
-const ALLOWED = /^(image\/|video\/|audio\/|application\/pdf|application\/zip|text\/plain|application\/vnd\.|application\/msword)/;
+const ALLOWED =
+  /^(image\/|video\/|audio\/|application\/pdf|application\/zip|text\/plain|application\/vnd\.|application\/msword)/;
 
 export function validateUpload(file: File): string | null {
   if (file.size > MAX_UPLOAD) return "File is larger than 50 MB";
@@ -241,7 +273,12 @@ export function kindForFile(file: File): Message["kind"] {
   return "file";
 }
 
-export async function uploadChatFile(convId: string, userId: string, file: File | Blob, name: string) {
+export async function uploadChatFile(
+  convId: string,
+  userId: string,
+  file: File | Blob,
+  name: string,
+) {
   const safe = name.replace(/[^\w.-]+/g, "_").slice(-80);
   const path = `${convId}/${userId}/${Date.now()}-${safe}`;
   const { error } = await supabase.storage
@@ -253,13 +290,17 @@ export async function uploadChatFile(convId: string, userId: string, file: File 
 
 export async function uploadGroupPicture(file: File) {
   const path = `groups/${Date.now()}-${file.name.replace(/[^\w.-]+/g, "_")}`;
-  const { error } = await supabase.storage.from("media").upload(path, file, { contentType: file.type });
+  const { error } = await supabase.storage
+    .from("media")
+    .upload(path, file, { contentType: file.type });
   if (error) throw error;
   return path;
 }
 
 /** Converts any YouTube link (watch, youtu.be, shorts, embed) into its video id. */
 export function youtubeId(url: string): string | null {
-  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/);
+  const m = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/,
+  );
   return m?.[1] ?? null;
 }

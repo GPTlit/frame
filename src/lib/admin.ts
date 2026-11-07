@@ -12,7 +12,13 @@ export type EventRow = {
   status: string;
 };
 
-export type NewsRow = { id: string; title: string; body: string | null; kind: string; created_at: string };
+export type NewsRow = {
+  id: string;
+  title: string;
+  body: string | null;
+  kind: string;
+  created_at: string;
+};
 
 /** True when the signed-in member holds the admin role (checked by the database). */
 export function useIsAdmin() {
@@ -24,7 +30,9 @@ export function useIsAdmin() {
     supabase.rpc("has_role", { _user_id: user.id, _role: "admin" }).then(({ data }) => {
       if (alive) setIsAdmin(data === true);
     });
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [user]);
   return isAdmin;
 }

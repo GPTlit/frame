@@ -6,14 +6,21 @@ import GradientWaves from "@/components/fx/GradientWaves";
 import { t, useLang } from "@/hooks/use-lang";
 import { supabase } from "@/integrations/supabase/client";
 import { listEvents, listNews, type EventRow, type NewsRow } from "@/lib/admin";
+import { FeaturedMediaSpotlight } from "@/components/frame/FeaturedMediaSpotlight";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
     meta: [
       { title: "Events & Stats — FRAME Mauritania" },
-      { name: "description", content: "Real FRAME events, news and live community numbers across Mauritania." },
+      {
+        name: "description",
+        content: "Real FRAME events, news and live community numbers across Mauritania.",
+      },
       { property: "og:title", content: "Events & Stats — FRAME Mauritania" },
-      { property: "og:description", content: "Real FRAME events, news and live community numbers." },
+      {
+        property: "og:description",
+        content: "Real FRAME events, news and live community numbers.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -23,7 +30,10 @@ export const Route = createFileRoute("/events")({
 
 function fmtDate(iso: string | null, lang: string) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString(lang === "ar" ? "ar" : lang, { day: "2-digit", month: "short" });
+  return new Date(iso).toLocaleDateString(lang === "ar" ? "ar" : lang, {
+    day: "2-digit",
+    month: "short",
+  });
 }
 
 function EventsPage() {
@@ -34,19 +44,31 @@ function EventsPage() {
   const [points, setPoints] = useState(0);
 
   useEffect(() => {
-    listEvents().then(setEvents).catch(() => setEvents([]));
-    listNews().then(setNews).catch(() => setNews([]));
-    supabase.from("profiles").select("points", { count: "exact" }).then(({ data, count }) => {
-      setMembers(count ?? 0);
-      setPoints((data ?? []).reduce((s, r) => s + (r.points ?? 0), 0));
-    });
+    listEvents()
+      .then(setEvents)
+      .catch(() => setEvents([]));
+    listNews()
+      .then(setNews)
+      .catch(() => setNews([]));
+    supabase
+      .from("profiles")
+      .select("points", { count: "exact" })
+      .then(({ data, count }) => {
+        setMembers(count ?? 0);
+        setPoints((data ?? []).reduce((s, r) => s + (r.points ?? 0), 0));
+      });
   }, []);
 
   const upcoming = (events ?? []).filter((e) => e.status !== "completed").length;
   const stats = [
     { value: String(members), en: "Registered members", fr: "Membres inscrits", ar: "عضو مسجل" },
     { value: String(events?.length ?? 0), en: "Events", fr: "Événements", ar: "حدث" },
-    { value: String(upcoming), en: "Upcoming & live", fr: "À venir et en cours", ar: "قادمة وجارية" },
+    {
+      value: String(upcoming),
+      en: "Upcoming & live",
+      fr: "À venir et en cours",
+      ar: "قادمة وجارية",
+    },
     { value: String(points), en: "Points awarded", fr: "Points attribués", ar: "نقطة ممنوحة" },
   ];
 
@@ -71,7 +93,11 @@ function EventsPage() {
           <div>
             {events && events.length === 0 && (
               <p className="rounded-lg border border-border p-6 text-muted-foreground">
-                {t(lang, { en: "No events published yet.", fr: "Aucun événement publié pour l'instant.", ar: "لا توجد أحداث منشورة بعد." })}
+                {t(lang, {
+                  en: "No events published yet.",
+                  fr: "Aucun événement publié pour l'instant.",
+                  ar: "لا توجد أحداث منشورة بعد.",
+                })}
               </p>
             )}
             {events && events.length > 0 && (
@@ -102,19 +128,29 @@ function EventsPage() {
             </h2>
             {news.length === 0 ? (
               <p className="mt-4 text-muted-foreground">
-                {t(lang, { en: "No news yet.", fr: "Pas encore d'actualités.", ar: "لا أخبار بعد." })}
+                {t(lang, {
+                  en: "No news yet.",
+                  fr: "Pas encore d'actualités.",
+                  ar: "لا أخبار بعد.",
+                })}
               </p>
             ) : (
               <div className="mt-4 grid gap-3">
                 {news.map((n) => (
                   <article key={n.id} className="rounded-lg border border-border p-5">
                     <div className="text-[12px] tracking-[0.14em] text-maroon-accent uppercase">
-                      {n.kind === "notification" ? t(lang, { en: "Notice", fr: "Avis", ar: "تنبيه" }) : t(lang, { en: "News", fr: "Actu", ar: "خبر" })}
+                      {n.kind === "notification"
+                        ? t(lang, { en: "Notice", fr: "Avis", ar: "تنبيه" })
+                        : t(lang, { en: "News", fr: "Actu", ar: "خبر" })}
                       {" · "}
                       {new Date(n.created_at).toLocaleDateString()}
                     </div>
                     <h3 className="mt-1 text-[18px] font-semibold">{n.title}</h3>
-                    {n.body && <p className="mt-1 text-[14.5px] whitespace-pre-line text-muted-foreground">{n.body}</p>}
+                    {n.body && (
+                      <p className="mt-1 text-[14.5px] whitespace-pre-line text-muted-foreground">
+                        {n.body}
+                      </p>
+                    )}
                   </article>
                 ))}
               </div>
@@ -142,6 +178,10 @@ function EventsPage() {
               ))}
             </div>
           </div>
+        </div>
+
+        <div className="mt-14">
+          <FeaturedMediaSpotlight placement="events" />
         </div>
       </section>
 

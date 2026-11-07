@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Theme = "light" | "dark";
 
@@ -21,8 +14,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = (localStorage.getItem(KEY) as Theme | null) ?? null;
     const initial: Theme =
-      stored ??
-      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      stored ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     setTheme(initial);
   }, []);
 

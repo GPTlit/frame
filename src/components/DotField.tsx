@@ -149,7 +149,6 @@ const DotField = memo(function DotField({
       if (t) setMouse(t.pageX, t.pageY);
     }
 
-
     function updateMouseSpeed() {
       const m = mouseRef.current;
       const dx = m.prevX - m.x;
@@ -281,7 +280,6 @@ const DotField = memo(function DotField({
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchstart", onTouchMove);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
