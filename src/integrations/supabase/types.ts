@@ -502,6 +502,7 @@ export type Database = {
           interests: string[]
           last_seen: string | null
           location: string | null
+          member_status: string
           points: number
           show_online: boolean
           social_links: Json
@@ -520,6 +521,7 @@ export type Database = {
           interests?: string[]
           last_seen?: string | null
           location?: string | null
+          member_status?: string
           points?: number
           show_online?: boolean
           social_links?: Json
@@ -538,6 +540,7 @@ export type Database = {
           interests?: string[]
           last_seen?: string | null
           location?: string | null
+          member_status?: string
           points?: number
           show_online?: boolean
           social_links?: Json
@@ -630,6 +633,7 @@ export type Database = {
         Args: { _conv: string; _uid: string }
         Returns: boolean
       }
+      is_member: { Args: { _user_id: string }; Returns: boolean }
       join_by_invite: { Args: { _code: string }; Returns: string }
       join_group: { Args: { _conv: string }; Returns: string }
       start_direct: { Args: { _other: string }; Returns: string }
