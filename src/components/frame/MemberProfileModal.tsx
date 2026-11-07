@@ -52,9 +52,10 @@ export function MemberProfileModal({
 }: MemberProfileModalProps) {
   const [copied, setCopied] = useState(false);
 
+  const resolvedCover = useAvatarUrl(member?.cover_url);
+
   if (!member) return null;
 
-  const resolvedCover = useAvatarUrl(member.cover_url);
   const socials = Object.entries(member.social_links || {}).filter(([_, url]) => Boolean(url));
 
   const handleMessage = () => {
