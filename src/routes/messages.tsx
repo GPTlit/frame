@@ -66,14 +66,32 @@ function MessagesPage() {
   if (loading) {
     return (
       <main className="grid min-h-[60vh] place-items-center pt-[92px]">
+        <BackHome />
         <span className="h-8 w-8 animate-spin rounded-full border-2 border-maroon-accent border-t-transparent" />
       </main>
     );
   }
   if (!user) {
-    return <VisitorCommunityScreen />;
+    return (
+      <>
+        <BackHome />
+        <VisitorCommunityScreen />
+      </>
+    );
   }
   return <ChatInterface />;
+}
+
+function BackHome() {
+  return (
+    <Link
+      to="/"
+      aria-label="Back"
+      className="fixed top-4 left-4 z-80 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow backdrop-blur"
+    >
+      <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+    </Link>
+  );
 }
 
 function VisitorCommunityScreen() {
@@ -834,7 +852,7 @@ function ChatInterface() {
   };
 
   return (
-    <main className="pt-[76px] h-screen w-full flex flex-col overflow-hidden bg-background">
+    <main className="fixed inset-0 z-60 h-[100dvh] w-full flex flex-col overflow-hidden bg-background">
       {statusToast && (
         <div className="fixed top-24 right-6 z-100 flex items-center gap-2 rounded-xl border border-maroon-accent/40 bg-background/95 px-4 py-2.5 text-xs font-semibold text-foreground shadow-xl backdrop-blur animate-fade-in">
           <span>{statusToast}</span>
@@ -849,7 +867,7 @@ function ChatInterface() {
       )}
 
       {/* FULL PAGE EDGE-TO-EDGE CHAT CONTAINER */}
-      <div className="flex-1 flex overflow-hidden w-full h-[calc(100vh-76px)]">
+      <div className="flex-1 flex overflow-hidden w-full h-full">
         {/* ================= LEFT SIDEBAR ================= */}
         <div
           className={`w-full md:w-[320px] lg:w-[360px] shrink-0 border-r border-border bg-card/60 flex flex-col h-full overflow-hidden ${
@@ -859,9 +877,18 @@ function ChatInterface() {
           {/* Header */}
           <div className="border-b border-border p-4 shrink-0 bg-background/50 backdrop-blur-sm">
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-[20px] font-bold text-foreground">
-                {t(lang, { en: "Messages", fr: "Messages", ar: "الرسائل" })}
-              </h1>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/"
+                  aria-label="Back"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-foreground hover:bg-muted"
+                >
+                  <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+                </Link>
+                <h1 className="font-display text-[20px] font-bold text-foreground">
+                  {t(lang, { en: "Chats", fr: "Discussions", ar: "الدردشات" })}
+                </h1>
+              </div>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
@@ -1119,7 +1146,7 @@ function ChatInterface() {
                     className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted md:hidden"
                     aria-label="Back"
                   >
-                    <ArrowLeft className="h-5 w-5" />
+                    <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
                   </button>
 
                   {/* Header Avatar */}
@@ -1237,7 +1264,15 @@ function ChatInterface() {
               </div>
 
               {/* Message Stream */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+              <div
+                className="flex-1 overflow-y-auto overscroll-contain p-3 sm:p-6 space-y-2"
+                style={{
+                  backgroundColor: "color-mix(in oklab, var(--muted) 55%, var(--background))",
+                  backgroundImage:
+                    "radial-gradient(color-mix(in oklab, var(--maroon-accent) 14%, transparent) 1px, transparent 1.4px)",
+                  backgroundSize: "18px 18px",
+                }}
+              >
                 {messages.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
                     <MessageSquare className="h-12 w-12 text-maroon-accent/40" />
@@ -1279,7 +1314,7 @@ function ChatInterface() {
 
                         {/* Bubble */}
                         <div
-                          className={`relative max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-2.5 text-[14px] shadow-sm ${
+                          className={`relative max-w-[85%] sm:max-w-[70%] rounded-2xl px-3 py-2 text-[14.5px] shadow-sm ${
                             isMe
                               ? "bg-[image:var(--gradient-ember)] text-paper rounded-br-xs"
                               : "bg-card border border-border text-foreground rounded-bl-xs"
@@ -1438,7 +1473,10 @@ function ChatInterface() {
               )}
 
               {/* Sticky Chat Input Bar */}
-              <div className="border-t border-border bg-card/95 p-3 sm:p-4 shrink-0 backdrop-blur-md">
+              <div
+                className="border-t border-border bg-card/95 px-2 pt-2 shrink-0 backdrop-blur-md"
+                style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+              >
                 {isRecording ? (
                   <div className="flex items-center justify-between rounded-xl bg-destructive/10 px-4 py-2.5">
                     <div className="flex items-center gap-2 text-destructive font-medium text-sm">
@@ -1478,7 +1516,7 @@ function ChatInterface() {
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isSending}
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-input text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                       title="Attach file/photo"
                     >
                       <Paperclip className="h-4 w-4" />
@@ -1499,26 +1537,29 @@ function ChatInterface() {
                         fr: "Écrivez votre message...",
                         ar: "اكتب رسالتك...",
                       })}
-                      className="flex-1 rounded-xl border border-input bg-background px-4 py-2.5 text-[14px] outline-none focus:border-maroon-accent transition-colors"
+                      className="flex-1 min-w-0 rounded-full border border-input bg-background px-4 py-2.5 text-[16px] outline-none focus:border-maroon-accent transition-colors"
                     />
 
-                    <button
-                      type="button"
-                      onClick={() => void startRecording()}
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-input text-muted-foreground hover:bg-muted hover:text-maroon-accent transition-colors"
-                      title="Record audio"
-                    >
-                      <Mic className="h-4 w-4" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => void handleSend()}
-                      disabled={!inputText.trim() || isSending}
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[image:var(--gradient-ember)] text-paper shadow-sm disabled:opacity-40 transition-transform active:scale-95"
-                    >
-                      <Send className="h-4 w-4" />
-                    </button>
+                    {inputText.trim() ? (
+                      <button
+                        type="button"
+                        onClick={() => void handleSend()}
+                        disabled={isSending}
+                        aria-label="Send"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[image:var(--gradient-ember)] text-paper shadow-md disabled:opacity-40 transition-transform active:scale-95"
+                      >
+                        <Send className="h-5 w-5 rtl:-scale-x-100" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void startRecording()}
+                        aria-label="Record voice message"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[image:var(--gradient-ember)] text-paper shadow-md transition-transform active:scale-95"
+                      >
+                        <Mic className="h-5 w-5" />
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
